@@ -14,9 +14,9 @@ from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Cm, Pt
 
-GITHUB_REPO_WEB = "https://github.com/flecen1/Methods_and_features_of_piece_ntelligence_lab7"
-GITHUB_CLONE_HTTPS = "https://github.com/flecen1/Methods_and_features_of_piece_ntelligence_lab7.git"
-REPO_FOLDER_NAME = "Methods_and_features_of_piece_ntelligence_lab7"
+GITHUB_REPO_WEB = "https://github.com/flecen1/Methods_and_features_of_piece_ntelligence_lab_7"
+GITHUB_CLONE_HTTPS = "https://github.com/flecen1/Methods_and_features_of_piece_ntelligence_lab_7.git"
+REPO_FOLDER_NAME = "Methods_and_features_of_piece_ntelligence_lab_7"
 
 
 def _set_normal_font(doc: Document, name: str = "Times New Roman", size: int = 14) -> None:
@@ -59,7 +59,7 @@ def build(output_path: Path) -> None:
         "Самостійна практична робота з курсу «Моделі та системи штучного інтелекту». "
         "Середовище виконання: мова Python.\n\n"
         f"Усі студенти отримують матеріали з офіційного репозиторію на GitHub: {GITHUB_REPO_WEB}\n\n"
-        "Версія документа: 1.4\n"
+        "Версія документа: 1.5\n"
         "Формат: Python 3.10+"
     )
     mr.font.size = Pt(12)

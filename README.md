@@ -6,14 +6,14 @@
 
 Усі матеріали (код, `requirements.txt`, методичні вказівки) потрібно брати **лише з офіційного репозиторію**, щоб версії збігалися.
 
-**Посилання:** [https://github.com/flecen1/Methods_and_features_of_piece_ntelligence_lab7](https://github.com/flecen1/Methods_and_features_of_piece_ntelligence_lab7)
+**Посилання:** [https://github.com/flecen1/Methods_and_features_of_piece_ntelligence_lab_7](https://github.com/flecen1/Methods_and_features_of_piece_ntelligence_lab_7)
 
 Клонування (PowerShell або Git Bash):
 
 ```powershell
 cd $env:USERPROFILE\Desktop
-git clone https://github.com/flecen1/Methods_and_features_of_piece_ntelligence_lab7.git
-cd Methods_and_features_of_piece_ntelligence_lab7
+git clone https://github.com/flecen1/Methods_and_features_of_piece_ntelligence_lab_7.git
+cd Methods_and_features_of_piece_ntelligence_lab_7
 ```
 
 Якщо Git не встановлено — на сторінці репозиторію натисніть **Code → Download ZIP**, розпакуйте архів і працюйте з отриманою папкою.
@@ -25,7 +25,7 @@ cd Methods_and_features_of_piece_ntelligence_lab7
 Рекомендовано віртуальне середовище **у папці клонованого репозиторію**:
 
 ```powershell
-cd $env:USERPROFILE\Desktop\Methods_and_features_of_piece_ntelligence_lab7
+cd $env:USERPROFILE\Desktop\Methods_and_features_of_piece_ntelligence_lab_7
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
