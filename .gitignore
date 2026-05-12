@@ -1,0 +1,10 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.idea/
+.vscode/
+*.png
+!figures/.gitkeep
+Methodical_Practice_GA_Python_UA_BUILD.docx
