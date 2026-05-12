@@ -119,6 +119,7 @@ class Lab7GUI:
             return
 
         try:
+            spec = build_variant(vid)
         except Exception as e:
             messagebox.showerror("Помилка", str(e))
             return
