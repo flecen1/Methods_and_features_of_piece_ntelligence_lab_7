@@ -10,7 +10,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 import numpy as np
 
@@ -80,7 +80,7 @@ def _mutate_gaussian(
     sigma_scale: float,
 ) -> np.ndarray:
     span = high - low
-    sigma = sigma_scale * span
+    sigma = np.maximum(sigma_scale * span, 1e-12 * (np.abs(high) + np.abs(low) + 1.0))
     out = child.copy()
     for i in range(out.size):
         if rng.random() < pm:
@@ -105,10 +105,21 @@ def run_ga(
 
     Усі задачі зводяться до мінімізації скаляра ``fitness_cost``.
     """
+    if population_size < 2:
+        raise ValueError("population_size має бути не менше 2 (потрібен турнірний відбір).")
+    if generations < 1:
+        raise ValueError("generations має бути >= 1.")
+    if elitism < 0 or elitism >= population_size:
+        raise ValueError("elitism має бути в діапазоні [0; population_size).")
     rng = np.random.default_rng(seed)
     low = np.array([b[0] for b in spec.bounds], dtype=float)
     high = np.array([b[1] for b in spec.bounds], dtype=float)
-    dim = low.size
+    if not np.all(np.isfinite(low)) or not np.all(np.isfinite(high)):
+        raise ValueError("Межі bounds мають бути скінченними числами.")
+    if not np.all(high > low):
+        raise ValueError("У кожній парі bounds має бути left < right.")
+    tsize = int(tournament_size)
+    tsize = max(2, min(tsize, population_size))
 
     pop = _init_population(rng, population_size, low, high)
     hist_best: List[float] = []
@@ -133,8 +144,8 @@ def run_ga(
             new_pop.append(pop[int(ei)].copy())
 
         while len(new_pop) < population_size:
-            pa = _tournament(rng, pop, costs, tournament_size)
-            pb = _tournament(rng, pop, costs, tournament_size)
+            pa = _tournament(rng, pop, costs, tsize)
+            pb = _tournament(rng, pop, costs, tsize)
             ca, cb = _crossover_arithmetic(rng, pa, pb, crossover_prob)
             ca = _mutate_gaussian(rng, ca, low, high, mutation_prob, mutation_sigma_scale)
             cb = _mutate_gaussian(rng, cb, low, high, mutation_prob, mutation_sigma_scale)

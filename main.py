@@ -17,11 +17,21 @@ from plotting import plot_variant
 from variants import build_variant
 
 
+def _positive_int(name: str, minimum: int):
+    def _coerce(s: str) -> int:
+        v = int(s)
+        if v < minimum:
+            raise argparse.ArgumentTypeError(f"{name} має бути >= {minimum}, отримано {v}")
+        return v
+
+    return _coerce
+
+
 def main() -> None:
     p = argparse.ArgumentParser(description="Лаб. 7: генетичний алгоритм (Python)")
     p.add_argument("--variant", type=int, default=1, choices=range(1, 6), help="Номер варіанту 1..5")
-    p.add_argument("--population", type=int, default=40)
-    p.add_argument("--generations", type=int, default=120)
+    p.add_argument("--population", type=_positive_int("population", 2), default=40)
+    p.add_argument("--generations", type=_positive_int("generations", 1), default=120)
     p.add_argument("--seed", type=int, default=None)
     p.add_argument("--plot", action="store_true", help="Побудувати графік функції")
     p.add_argument("--plot-file", type=str, default=None, help="Зберегти графік у файл")
@@ -56,7 +66,10 @@ def main() -> None:
         print("Значення цільової f:", res.best_objective_value)
 
     if args.plot or args.plot_file:
-        plot_variant(args.variant, out_path=args.plot_file, show=not args.no_show)
+        try:
+            plot_variant(args.variant, out_path=args.plot_file, show=not args.no_show)
+        except (OSError, ValueError) as e:
+            raise SystemExit(f"Помилка побудови графіка: {e}") from e
 
 
 if __name__ == "__main__":

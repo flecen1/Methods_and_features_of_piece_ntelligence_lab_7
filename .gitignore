@@ -1,3 +1,4 @@
+# Студентський репозиторій — лише код для запуску практичної роботи
 .venv/
 venv/
 __pycache__/
@@ -7,4 +8,7 @@ __pycache__/
 .vscode/
 *.png
 !figures/.gitkeep
-Methodical_Practice_GA_Python_UA_BUILD.docx
+*.docx
+build_methodical_docx.py
+.DS_Store
+Thumbs.db

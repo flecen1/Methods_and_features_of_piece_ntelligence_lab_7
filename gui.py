@@ -43,23 +43,62 @@ class Lab7GUI:
         ttk.Label(frm, text="Сід (опційно)").grid(row=3, column=0, sticky="w", pady=4)
         self.var_seed = tk.StringVar(value="")
         ttk.Entry(frm, textvariable=self.var_seed, width=8).grid(row=3, column=1)
+        hint = ttk.Label(
+            frm,
+            text="Порожній сід → кожен запуск інший (так і має бути у ГА).\n"
+            "Той самий сід → той самий результат.",
+            wraplength=220,
+            font=("Segoe UI", 8),
+            foreground="#555",
+        )
+        hint.grid(row=4, column=0, columnspan=2, sticky="w", pady=(0, 4))
 
-        ttk.Button(frm, text="Запустити ГА", command=self._run).grid(row=4, column=0, columnspan=2, pady=12, sticky="ew")
+        ttk.Button(frm, text="Запустити ГА", command=self._run).grid(row=5, column=0, columnspan=2, pady=(8, 4), sticky="ew")
 
-        self.txt = tk.Text(frm, width=42, height=22, wrap="word")
-        self.txt.grid(row=5, column=0, columnspan=2, pady=4)
+        btn_row = ttk.Frame(frm)
+        btn_row.grid(row=6, column=0, columnspan=2, sticky="ew", pady=(0, 4))
+        btn_row.columnconfigure(0, weight=1)
+        btn_row.columnconfigure(1, weight=1)
+        ttk.Button(btn_row, text="Очистити графіки", command=self._clear_plots).grid(row=0, column=0, padx=(0, 2), sticky="ew")
+        ttk.Button(btn_row, text="Очистити журнал", command=self._clear_log).grid(row=0, column=1, padx=(2, 0), sticky="ew")
+        ttk.Button(frm, text="Очистити все", command=self._clear_all).grid(row=7, column=0, columnspan=2, pady=(0, 6), sticky="ew")
+
+        self.txt = tk.Text(frm, width=42, height=20, wrap="word")
+        self.txt.grid(row=8, column=0, columnspan=2, pady=4)
 
         plot_frame = ttk.Frame(self.root)
         plot_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True, padx=4, pady=4)
 
-        self.fig, (self.ax1, self.ax2) = plt.subplots(2, 1, figsize=(6.5, 6.2))
-        self.fig.subplots_adjust(hspace=0.35)
+        self.fig = plt.Figure(figsize=(6.5, 6.2))
         self.canvas = FigureCanvasTkAgg(self.fig, master=plot_frame)
         self.canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+        self.ax1 = None  # type: ignore[assignment]
+        self.ax2 = None  # type: ignore[assignment]
+        self._recreate_axes()
 
     def _log(self, s: str) -> None:
         self.txt.insert(tk.END, s + "\n")
         self.txt.see(tk.END)
+
+    def _recreate_axes(self) -> None:
+        """Повністю пересоздає осі фігури (colorbar додає окремі axes — clf їх прибирає)."""
+        self.fig.clf()
+        self.ax1 = self.fig.add_subplot(2, 1, 1)
+        self.ax2 = self.fig.add_subplot(2, 1, 2)
+        self.fig.subplots_adjust(hspace=0.35)
+
+    def _clear_plots(self) -> None:
+        self._recreate_axes()
+        self.ax1.text(0.5, 0.5, "Натисніть «Запустити ГА»", ha="center", va="center", transform=self.ax1.transAxes, alpha=0.45)
+        self.fig.tight_layout()
+        self.canvas.draw()
+
+    def _clear_log(self) -> None:
+        self.txt.delete("1.0", tk.END)
+
+    def _clear_all(self) -> None:
+        self._clear_log()
+        self._clear_plots()
 
     def _run(self) -> None:
         try:
@@ -72,8 +111,14 @@ class Lab7GUI:
             messagebox.showerror("Помилка", "Перевірте числові поля.")
             return
 
+        if pop < 2:
+            messagebox.showerror("Помилка", "Розмір популяції має бути не менше 2.")
+            return
+        if gen < 1:
+            messagebox.showerror("Помилка", "Кількість поколінь має бути не менше 1.")
+            return
+
         try:
-            spec = build_variant(vid)
         except Exception as e:
             messagebox.showerror("Помилка", str(e))
             return
@@ -90,8 +135,7 @@ class Lab7GUI:
         self._log(f"Значення f: {res.best_objective_value:.8g}")
         self._log(f"Внутрішній cost: {res.best_internal_cost:.8g}")
 
-        self.ax1.clear()
-        self.ax2.clear()
+        self._recreate_axes()
 
         if spec.n_vars == 1:
             a, b = spec.bounds[0]
@@ -139,7 +183,10 @@ class Lab7GUI:
         self.ax2.legend(loc="upper right", fontsize=8)
 
         self.fig.tight_layout()
-        self.canvas.draw()
+        try:
+            self.canvas.draw()
+        except Exception as e:
+            messagebox.showerror("Помилка графіка", str(e))
 
     def mainloop(self) -> None:
         self.root.mainloop()
