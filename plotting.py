@@ -1,14 +1,32 @@
 # -*- coding: utf-8 -*-
-"""Побудова графіків цільових функцій для звіту."""
+"""Побудова графіків цільових функцій для звіту та GUI."""
 
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Tuple
 
 import numpy as np
 
-from variants import build_variant
+from variants import VariantSpec, build_variant
+
+
+def sample_1d(spec: VariantSpec, n: int = 400) -> Tuple[np.ndarray, np.ndarray]:
+    a, b = spec.bounds[0]
+    xs = np.linspace(a, b, n)
+    ys = np.array([spec.objective(np.array([x])) for x in xs], dtype=float)
+    return xs, ys
+
+
+def sample_2d(spec: VariantSpec, n: int = 80) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    a1, b1 = spec.bounds[0]
+    a2, b2 = spec.bounds[1]
+    x = np.linspace(a1, b1, n)
+    y = np.linspace(a2, b2, n)
+    X, Y = np.meshgrid(x, y)
+    flat = np.stack([X.ravel(), Y.ravel()], axis=1)
+    Z = np.array([spec.objective(flat[i]) for i in range(flat.shape[0])], dtype=float).reshape(X.shape)
+    return X, Y, Z
 
 
 def plot_variant(variant_id: int, *, out_path: Optional[str] = None, show: bool = True) -> None:
@@ -23,9 +41,7 @@ def plot_variant(variant_id: int, *, out_path: Optional[str] = None, show: bool 
     fig = None
     try:
         if spec.n_vars == 1:
-            a, b = spec.bounds[0]
-            xs = np.linspace(a, b, 800)
-            ys = np.array([spec.objective(np.array([x])) for x in xs], dtype=float)
+            xs, ys = sample_1d(spec, 800)
             fig, ax = plt.subplots(figsize=(8, 4.5))
             ax.plot(xs, ys, lw=2, color="#1f77b4")
             ax.set_title(f"Варіант {variant_id}: {spec.name}\n{spec.latex_hint}")
@@ -34,14 +50,7 @@ def plot_variant(variant_id: int, *, out_path: Optional[str] = None, show: bool 
             ax.grid(True, alpha=0.3)
             fig.tight_layout()
         else:
-            a1, b1 = spec.bounds[0]
-            a2, b2 = spec.bounds[1]
-            n = 120
-            x = np.linspace(a1, b1, n)
-            y = np.linspace(a2, b2, n)
-            X, Y = np.meshgrid(x, y)
-            flat = np.stack([X.ravel(), Y.ravel()], axis=1)
-            Z = np.array([spec.objective(flat[i]) for i in range(flat.shape[0])], dtype=float).reshape(X.shape)
+            X, Y, Z = sample_2d(spec, 120)
             fig = plt.figure(figsize=(9, 5))
             ax = fig.add_subplot(111, projection="3d")
             surf = ax.plot_surface(X, Y, Z, cmap="viridis", linewidth=0, antialiased=True, alpha=0.95)

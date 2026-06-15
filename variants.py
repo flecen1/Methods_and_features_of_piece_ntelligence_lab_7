@@ -141,3 +141,33 @@ def interpret_result(spec: VariantSpec, pheno: np.ndarray, best_cost: float) -> 
     """Повертає (значення цільової f на знайденій точці, best_cost внутрішній)."""
     fval = spec.objective(np.asarray(pheno, dtype=float))
     return fval, best_cost
+
+
+def variant_student_summary(vid: int) -> str:
+    """Короткий опис варіанту для студента (табл. 8.1)."""
+    spec = build_variant(vid)
+    mode = "максимум" if spec.mode == "max" else "мінімум"
+    bounds = ", ".join(f"[{a}; {b}]" for a, b in spec.bounds)
+    return (
+        f"Варіант {vid}: {spec.name}\n"
+        f"Функція: {spec.latex_hint}\n"
+        f"Область: {bounds}\n"
+        f"Знайти: {mode}"
+    )
+
+
+def cli_command(variant: int, population: int, generations: int, seed: int | None, *, plot: bool = False) -> str:
+    """Рядок команди для звіту (завдання 1–2 методички)."""
+    parts = [
+        "python main.py",
+        f"--variant {variant}",
+        f"--population {population}",
+        f"--generations {generations}",
+    ]
+    if seed is not None:
+        parts.append(f"--seed {seed}")
+    if plot:
+        parts.append("--plot")
+        parts.append(f"--plot-file figures\\variant{variant}.png")
+        parts.append("--no-show")
+    return " ".join(parts)
