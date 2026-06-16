@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Графічний інтерфейс практичної роботи 7 — 4 завдання методички.
+Графічний інтерфейс лабораторної роботи 7 — 4 завдання методички.
 """
 
 from __future__ import annotations
@@ -36,7 +36,7 @@ FONT_TITLE = ("Segoe UI", 13, "bold")
 class Lab7GUI:
     def __init__(self) -> None:
         self.root = tk.Tk()
-        self.root.title("Лаб. 7 — Генетичний алгоритм")
+        self.root.title("Лабораторна робота 7 — генетичний алгоритм")
         self.root.geometry("1100x700")
         self.root.minsize(920, 580)
         self.root.configure(bg=BG)
@@ -67,7 +67,7 @@ class Lab7GUI:
         side.pack(side=tk.LEFT, fill=tk.Y)
         side.pack_propagate(False)
 
-        tk.Label(side, text="Практична робота 7", bg=SIDEBAR, fg=SIDEBAR_TEXT, font=FONT_TITLE).pack(
+        tk.Label(side, text="Лабораторна робота 7", bg=SIDEBAR, fg=SIDEBAR_TEXT, font=FONT_TITLE).pack(
             anchor="w", padx=18, pady=(18, 2)
         )
         tk.Label(
